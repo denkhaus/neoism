@@ -7,5 +7,5 @@
 package neoism
 
 func dbConnect(url string) (*Database, error) {
-	return Connect(url)
+	return Connect(url, "", "")
 }
