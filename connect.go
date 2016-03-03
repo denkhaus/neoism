@@ -7,27 +7,25 @@
 package neoism
 
 import (
+	"encoding/base64"
+	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"gopkg.in/jmcvetta/napping.v3"
 )
 
 // Connect setups parameters for the Neo4j server
 // and calls ConnectWithRetry()
-func Connect(uri string) (*Database, error) {
+func Connect(uri, user, pass string) (*Database, error) {
 	h := http.Header{}
 	h.Add("User-Agent", "neoism")
+	authPayload := fmt.Sprintf("%s:%s", user, pass)
+	h.Add("Authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(authPayload))))
 	db := &Database{
 		Session: &napping.Session{
 			Header: &h,
 		},
-	}
-
-	// trailing slash is important, check if it's not there and add it
-	if !strings.HasSuffix(uri, "/") {
-		uri += "/"
 	}
 	parsedURL, err := url.Parse(uri)
 	if err != nil {
